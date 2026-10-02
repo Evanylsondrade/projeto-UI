@@ -4,6 +4,7 @@ import { CalendarDays, ChartNoAxesCombined, Home, LogOut, Menu, PawPrint, Scisso
 import * as Dialog from '@radix-ui/react-dialog';
 import { useAuth } from '../auth/AuthContext';
 import { Button } from './ui/button';
+import { toast } from 'sonner';
 
 const navigation = [
   { icon: Home, label: 'Início', path: '/' },
@@ -33,10 +34,10 @@ export function Layout() {
     document.title = `${currentPage} | SmartPet Hub`;
   }, [location.pathname, currentPage]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setMenuOpen(false);
-    logout();
-    navigate('/login', { replace: true });
+    try { await logout(); navigate('/login', { replace: true }); }
+    catch (error) { toast.error((error as Error).message); }
   };
 
   const employeeInfo = (
@@ -68,9 +69,9 @@ export function Layout() {
       <div className="min-w-0 lg:pl-64">
         <header className="sticky top-0 z-20 border-b border-slate-100 bg-white/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:min-h-20 lg:px-8">
-            <div className="min-w-0"><Link to="/" aria-label="SmartPet Hub — início" className="inline-block rounded-xl lg:hidden"><Brand /></Link><p className="hidden text-sm font-medium text-slate-600 lg:block">Gestão do pet shop <span className="mx-2 text-slate-300" aria-hidden="true">/</span> <span className="text-slate-800">{currentPage}</span></p><span className="mt-1 inline-flex rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium text-orange-800 lg:hidden">Demonstração</span></div>
+            <div className="min-w-0"><Link to="/" aria-label="SmartPet Hub — início" className="inline-block rounded-xl lg:hidden"><Brand /></Link><p className="hidden text-sm font-medium text-slate-600 lg:block">Gestão do pet shop <span className="mx-2 text-slate-300" aria-hidden="true">/</span> <span className="text-slate-800">{currentPage}</span></p><span className="mt-1 inline-flex rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium text-orange-800 lg:hidden">Acesso autenticado</span></div>
             <div className="flex shrink-0 items-center gap-3 lg:gap-5">
-              <span className="hidden rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-800 lg:inline-flex">Demonstração</span>
+              <span className="hidden rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-800 lg:inline-flex">Acesso autenticado</span>
               <div className="hidden lg:block">{employeeInfo}</div>
               <Dialog.Root open={menuOpen} onOpenChange={setMenuOpen}>
                 <Dialog.Trigger asChild><button type="button" aria-label="Abrir menu" className="flex size-11 items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-[#3296FA] lg:hidden"><Menu size={22} /></button></Dialog.Trigger>
@@ -79,7 +80,7 @@ export function Layout() {
                   <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex w-[min(88vw,22rem)] flex-col overflow-y-auto bg-white p-5 shadow-xl data-[state=open]:animate-in data-[state=open]:slide-in-from-right">
                     <div className="mb-5 flex items-center justify-between gap-2"><Dialog.Title className="text-lg font-semibold text-slate-800">Menu do pet shop</Dialog.Title><Dialog.Close asChild><button type="button" aria-label="Fechar menu" className="flex size-11 items-center justify-center rounded-xl hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-[#3296FA]"><X size={20} /></button></Dialog.Close></div>
                     <Dialog.Description className="sr-only">Acesse os cadastros e as áreas de gestão disponíveis para seu perfil.</Dialog.Description>
-                    <div className="mb-6 rounded-2xl bg-slate-50 p-4">{employeeInfo}<span className="mt-3 inline-flex rounded-full bg-orange-50 px-2 py-1 text-xs font-medium text-orange-800">Demonstração</span></div>
+                    <div className="mb-6 rounded-2xl bg-slate-50 p-4">{employeeInfo}<span className="mt-3 inline-flex rounded-full bg-orange-50 px-2 py-1 text-xs font-medium text-orange-800">Acesso autenticado</span></div>
                     <nav aria-label="Menu completo">{desktopLinks}</nav>
                     <div className="mt-auto pt-6"><Button variant="outline" onClick={handleLogout} className="min-h-12 w-full rounded-xl text-slate-600"><LogOut size={18} aria-hidden="true" /> Sair da conta</Button></div>
                   </Dialog.Content>
@@ -89,7 +90,10 @@ export function Layout() {
           </div>
         </header>
 
-        <main id="main-content" tabIndex={-1} className="min-w-0 pb-24 outline-none lg:pb-0"><Outlet /></main>
+        <main id="main-content" tabIndex={-1} className="min-w-0 pb-24 outline-none lg:pb-0">
+          {location.pathname !== '/tutores' && <p role="note" className="mx-4 mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">Esta área ainda usa dados locais de demonstração. Apenas o acesso da equipe e a tela de Tutores estão conectados ao banco. Os dados demonstrativos não são misturados com os cadastros reais.</p>}
+          <Outlet />
+        </main>
       </div>
 
       <nav aria-label="Navegação rápida" className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.03)] lg:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>

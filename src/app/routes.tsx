@@ -13,8 +13,9 @@ const Relatorios = lazy(() => import('./pages/Relatorios').then(module => ({ def
 import { Layout } from "./components/Layout";
 
 function ProtectedRoutes() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
+  if (loading) return <p className="page-container" role="status">Verificando sessão…</p>;
   if (!user) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}${location.hash}` }} />;
   return <Outlet />;
 }

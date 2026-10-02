@@ -6,7 +6,12 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test": "node --experimental-strip-types --test tests/data.test.ts"
+    "test": "node --experimental-strip-types --test tests/data.test.ts backend/tests/*.test.mjs",
+    "server": "node backend/src/server.mjs",
+    "server:dev": "node --watch backend/src/server.mjs",
+    "db:migrate": "node backend/src/migrate.mjs",
+    "auth:bootstrap": "node backend/src/bootstrap.mjs",
+    "test:backend": "node --test backend/tests/*.test.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
